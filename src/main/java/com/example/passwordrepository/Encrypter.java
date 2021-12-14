@@ -30,7 +30,6 @@ public class Encrypter {
         Cipher encryptionCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         encryptionCipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
-        //BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(wayToFile));
         BufferedOutputStream bufferedWriter = new BufferedOutputStream(new FileOutputStream(wayToFile));
         System.out.println(text);
         byte[] encryptedText = encryptionCipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
@@ -45,24 +44,18 @@ public class Encrypter {
         cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(password));
 
         byte[] symbolsFromFile;
-        byte[] line = new byte[0];
 
         Path path = Paths.get(wayToFile);
         symbolsFromFile = Files.readAllBytes(path);
-        System.out.println(symbolsFromFile);
         byte[] decryptedText = null;
-        if (!Arrays.equals(symbolsFromFile, line)){
-            System.out.println(symbolsFromFile);
+        if (!Arrays.equals(symbolsFromFile, new byte[0])){
             decryptedText = cipher.doFinal(symbolsFromFile);
         }
-        System.out.println(decryptedText);
-        System.out.println("We are here");
         return decryptedText;
     }
     
     PublicKey getPublicKey(String password) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException {
         KeyStore keyStore = optionKeyStoreParam(password);
-        System.out.println("OK");
         PublicKey publicKey = keyStore.getCertificate(alias).getPublicKey();
         System.out.println(publicKey);
         return publicKey;
