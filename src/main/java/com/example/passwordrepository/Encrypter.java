@@ -31,9 +31,7 @@ public class Encrypter {
         encryptionCipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
         BufferedOutputStream bufferedWriter = new BufferedOutputStream(new FileOutputStream(wayToFile));
-        System.out.println(text);
         byte[] encryptedText = encryptionCipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
-        System.out.println(encryptedText);
         bufferedWriter.write(encryptedText);
         bufferedWriter.flush();
         bufferedWriter.close();

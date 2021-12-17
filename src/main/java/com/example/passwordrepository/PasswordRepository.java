@@ -29,10 +29,12 @@ public class PasswordRepository extends Application {
     static private final double x = screenSize.getWidth();
     static private final double y = screenSize.getHeight() - 55;
 
-    //static private String decryptedText = "";
     static private TextArea textArea = new TextArea();
     static private TextField textFieldForSearching = new TextField();
-    static private Button searchBtn = new Button();
+
+    static private String needfulText = "";
+    static private int textCount = 0;
+    static private String copyOfDecryptedText;
 
     @Override
     public void start(Stage stage) {
@@ -104,6 +106,7 @@ public class PasswordRepository extends Application {
             if (decryptedBytes != null){
                 decryptedText = new String(decryptedBytes);
             }
+            copyOfDecryptedText = decryptedText;
             createStageWithDecryptedInformationFromFile(decryptedText, encrypter, password);
             return true;
         }
@@ -118,6 +121,7 @@ public class PasswordRepository extends Application {
         informationStage.setTitle("Ok, you arent a virus");
 
         Pane informationPane = new Pane();
+        Scene informationScene = new Scene(informationPane, x, y);
 
         textArea.insertText(0, decryptedText);
         textArea.setPrefSize(x - 200, y - 100);
@@ -125,53 +129,42 @@ public class PasswordRepository extends Application {
             @Override
             public void handle(KeyEvent keyEvent) {
                 if(keyEvent.getCode().equals(KeyCode.SHIFT)){
-                    searchBtn.setVisible(true);
-                    textArea.setVisible(false);
-                    textFieldForSearching.setVisible(true);
-                    textArea.setVisible(true);
+                    textFieldForSearching.requestFocus();
                 }
             }
         });
-
-
-        textFieldForSearching.setLayoutX(x - 200);
-        textFieldForSearching.setLayoutY(100);
-        textFieldForSearching.setPrefSize(100, 50);
-
         Label mistakeLabel = new Label();
         mistakeLabel.setLayoutX(x - 200);
         mistakeLabel.setLayoutY(160);
 
-        searchBtn.setLayoutX(x - 100);
-        searchBtn.setLayoutY(100);
-        searchBtn.setPrefSize(50, 50);
-        searchBtn.setOnAction(new EventHandler<ActionEvent>() {
+        textFieldForSearching.setLayoutX(x - 200);
+        textFieldForSearching.setLayoutY(100);
+        textFieldForSearching.setPrefSize(100, 50);
+        textFieldForSearching.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
-            public void handle(ActionEvent actionEvent) {
-                try {
-                    search(textFieldForSearching.getText(), textArea.getText());
-                    mistakeLabel.setText("");
-                } catch (Exception e){
-                    mistakeLabel.setText("There a no such word");
-                    textFieldForSearching.setVisible(true);
-                    searchBtn.setVisible(true);
+            public void handle(KeyEvent keyEvent) {
+                if(keyEvent.getCode().equals(KeyCode.ENTER)){
+                    try {
+                        search(textFieldForSearching.getText(), textArea.getText());
+                        mistakeLabel.setText("");
+                    } catch (Exception e){
+                        mistakeLabel.setText("There a no such word");
+                    }
                 }
             }
         });
-
-        Scene informationScene = new Scene(informationPane, x, y);
         informationScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
                 if(keyEvent.getCode().equals(KeyCode.SHIFT)){
 
+                    System.out.println("HI");
                 }
             }
         });
 
         informationPane.getChildren().add(textArea);
         informationPane.getChildren().add(textFieldForSearching);
-        informationPane.getChildren().add(searchBtn);
         informationPane.getChildren().add(mistakeLabel);
 
 
@@ -187,9 +180,15 @@ public class PasswordRepository extends Application {
         informationStage.show();
     }
     private static void search(String text, String decryptedText){
-        textFieldForSearching.setVisible(false);
-        searchBtn.setVisible(false);
-        textArea.insertText(decryptedText.indexOf(text), "");
-        //textArea.positionCaret(decryptedText.indexOf(text));
+        textArea.requestFocus();
+        if (needfulText.equals(text)){
+            copyOfDecryptedText = copyOfDecryptedText.substring(0, copyOfDecryptedText.indexOf(text)) + copyOfDecryptedText.substring(copyOfDecryptedText.indexOf(text) + text.length());
+            textCount++;
+        }
+        else {
+            textCount = 0;
+        }
+        textArea.positionCaret(copyOfDecryptedText.indexOf(text) + textCount * text.length());
+        needfulText = text;
     }
 }
