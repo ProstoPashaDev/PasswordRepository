@@ -1,4 +1,4 @@
-package com.example.passwordrepository;
+package com.Pavel.passwordrepository;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

@@ -16,5 +16,10 @@
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="javafx" />
+      <option name="name" value="JavaFX" />
+      <option name="url" value="E:\javafx-sdk-11.0.2\lib" />
+    </remote-repository>
   </component>
 </project>

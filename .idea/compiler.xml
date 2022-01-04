@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="PasswordRepository" target="13" />
+      <module name="PasswordRepository" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

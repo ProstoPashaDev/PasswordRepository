@@ -1,4 +1,4 @@
-package com.example.passwordrepository;
+package com.Pavel.passwordrepository;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -10,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -22,6 +24,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.util.Optional;
 
 public class PasswordRepository extends Application {
 
@@ -35,6 +38,7 @@ public class PasswordRepository extends Application {
     static private String needfulText = "";
     static private int textCount = 0;
     static private String copyOfDecryptedText;
+    static private Label mistakeLabel = new Label();
 
     @Override
     public void start(Stage stage) {
@@ -52,14 +56,20 @@ public class PasswordRepository extends Application {
 
         Pane entryPane = new Pane();
         PasswordField passwordField = new PasswordField();
+        passwordField.setLayoutY(25);
+
+        Label entryPasswordLabel = new Label();
+        entryPasswordLabel.setLayoutX(5);
+        entryPasswordLabel.setText("Enter password");
 
         Label wrongPasswordLabel = new Label();
         wrongPasswordLabel.setLayoutX(5);
-        wrongPasswordLabel.setLayoutY(40);
+        wrongPasswordLabel.setLayoutY(65);
 
         Button checkPasswordBtn = new Button();
         checkPasswordBtn.setText("Check Password");
         checkPasswordBtn.setLayoutX(220);
+        checkPasswordBtn.setLayoutY(25);
         checkPasswordBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -67,10 +77,11 @@ public class PasswordRepository extends Application {
                     if(getPublicKeyReEncryptFileAndPrintFile(encrypter, wrongPasswordLabel, passwordField.getText())){
                         entryStage.close();
                     }
-                } catch (CertificateException | IOException | KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {}
+                } catch (Exception ignored) {}
             }
         });
 
+        entryPane.getChildren().add(entryPasswordLabel);
         entryPane.getChildren().add(passwordField);
         entryPane.getChildren().add(checkPasswordBtn);
         entryPane.getChildren().add(wrongPasswordLabel);
@@ -84,7 +95,7 @@ public class PasswordRepository extends Application {
                         if(getPublicKeyReEncryptFileAndPrintFile(encrypter, wrongPasswordLabel, passwordField.getText())){
                             entryStage.close();
                         }
-                    } catch (Exception e){}
+                    } catch (Exception ignored){}
                 }
             }
         });
@@ -99,7 +110,7 @@ public class PasswordRepository extends Application {
         try {
             publicKey = encrypter.getPublicKey(password);
         }
-        catch (Exception e){}
+        catch (Exception ignored){}
         if (publicKey != null){
             byte[] decryptedBytes = encrypter.decryptFile(password);
 
@@ -121,74 +132,130 @@ public class PasswordRepository extends Application {
         informationStage.setTitle("Ok, you arent a virus");
 
         Pane informationPane = new Pane();
-        Scene informationScene = new Scene(informationPane, x, y);
+
 
         textArea.insertText(0, decryptedText);
-        textArea.setPrefSize(x - 200, y - 100);
+        textArea.setPrefSize(x - 150, y - 20);
+        final KeyCombination keyCombinationShiftF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+        final KeyCombination keyCombinationShiftS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
         textArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if(keyEvent.getCode().equals(KeyCode.SHIFT)){
+                if (keyCombinationShiftF.match(keyEvent)){
                     textFieldForSearching.requestFocus();
+                }
+                else if (keyCombinationShiftS.match(keyEvent)){
+                    try {
+                        encrypter.encryptInformationAndWriteItToFile(password, textArea.getText());
+                    }
+                    catch(Exception ignored){}
                 }
             }
         });
-        Label mistakeLabel = new Label();
-        mistakeLabel.setLayoutX(x - 200);
-        mistakeLabel.setLayoutY(160);
+        mistakeLabel.setLayoutX(x - 133);
+        mistakeLabel.setLayoutY(190);
 
-        textFieldForSearching.setLayoutX(x - 200);
-        textFieldForSearching.setLayoutY(100);
+        Button saveFileButton = new Button();
+        saveFileButton.setText("Save");
+        saveFileButton.setLayoutX(x - 133);
+        saveFileButton.setLayoutY(30);
+        saveFileButton.setPrefSize(100, 50);
+        saveFileButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    encrypter.encryptInformationAndWriteItToFile(password, textArea.getText());
+                } catch(Exception ignored) {}
+            }
+        });
+
+        Label textSearchLabel = new Label("Search text");
+        textSearchLabel.setLayoutX(x - 117);
+        textSearchLabel.setLayoutY(100);
+
+        textFieldForSearching.setLayoutX(x - 133);
+        textFieldForSearching.setLayoutY(130);
         textFieldForSearching.setPrefSize(100, 50);
         textFieldForSearching.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if(keyEvent.getCode().equals(KeyCode.ENTER)){
+                if(keyEvent.getCode().equals(KeyCode.ENTER)) {
                     try {
                         search(textFieldForSearching.getText(), textArea.getText());
-                        mistakeLabel.setText("");
-                    } catch (Exception e){
-                        mistakeLabel.setText("There a no such word");
+                    } catch (Exception ignored) {}
+                }
+                else if (keyCombinationShiftS.match(keyEvent)) {
+                    try {
+                        encrypter.encryptInformationAndWriteItToFile(password, textArea.getText());
+                    } catch (Exception ignored) {
                     }
                 }
             }
         });
-        informationScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                if(keyEvent.getCode().equals(KeyCode.SHIFT)){
 
-                    System.out.println("HI");
-                }
-            }
-        });
-
+        informationPane.getChildren().add(saveFileButton);
+        informationPane.getChildren().add(textSearchLabel
+        );
         informationPane.getChildren().add(textArea);
         informationPane.getChildren().add(textFieldForSearching);
         informationPane.getChildren().add(mistakeLabel);
 
-
+        Scene informationScene = new Scene(informationPane, x, y);
+        informationScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (keyCombinationShiftF.match(keyEvent)){
+                    textFieldForSearching.requestFocus();
+                }
+            }
+        });
         informationStage.setScene(informationScene);
         informationStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent windowEvent) {
                 try {
-                    encrypter.encryptInformationAndWriteItToFile(password, textArea.getText());
-                } catch (Exception e) {}
+                    if (!textArea.getText().equals(new String(encrypter.decryptFile(password)))){
+                        try {
+                            createAlert(encrypter, password);
+                        } catch (Exception ignored){}
+                    }
+                } catch (Exception ignored){}
             }
         });
         informationStage.show();
     }
     private static void search(String text, String decryptedText){
         textArea.requestFocus();
-        if (needfulText.equals(text)){
+        if (needfulText.equals(text)) {
+            System.out.println(1);
             copyOfDecryptedText = copyOfDecryptedText.substring(0, copyOfDecryptedText.indexOf(text)) + copyOfDecryptedText.substring(copyOfDecryptedText.indexOf(text) + text.length());
+            System.out.println(copyOfDecryptedText);
             textCount++;
+        } else {
+            textCount = 0;
+            copyOfDecryptedText = decryptedText;
+        }
+        if (copyOfDecryptedText.contains(text)) {
+            textArea.positionCaret(copyOfDecryptedText.indexOf(text) + textCount * text.length());
+            mistakeLabel.setText(null);
         }
         else {
-            textCount = 0;
+            if (textCount == 0){
+                mistakeLabel.setText("There is no such text");
+            }
+            else {
+                mistakeLabel.setText("There is no more \n  such text");
+            }
         }
-        textArea.positionCaret(copyOfDecryptedText.indexOf(text) + textCount * text.length());
         needfulText = text;
+    }
+    private static void createAlert(Encrypter encrypter, String password) throws NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, BadPaddingException, InvalidKeyException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "File has been modified, save changes?", ButtonType.YES, ButtonType.NO);
+        alert.setTitle("Save file");
+        alert.setHeaderText(null);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get().equals(ButtonType.YES)){
+            encrypter.encryptInformationAndWriteItToFile(password, textArea.getText());
+        }
     }
 }
