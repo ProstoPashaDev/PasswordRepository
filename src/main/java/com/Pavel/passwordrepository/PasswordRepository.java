@@ -22,6 +22,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.awt.*;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.Optional;
@@ -32,16 +33,19 @@ public class PasswordRepository extends Application {
     static private final double x = screenSize.getWidth();
     static private final double y = screenSize.getHeight() - 55;
 
-    static private TextArea textArea = new TextArea();
-    static private TextField textFieldForSearching = new TextField();
+    static private TextArea textArea;
+    static private TextField textFieldForSearching;
 
     static private String needfulText = "";
     static private int textCount = 0;
     static private String copyOfDecryptedText;
-    static private Label mistakeLabel = new Label();
+    static private Label mistakeLabel;
 
     @Override
     public void start(Stage stage) {
+        textArea = new TextArea();
+        textFieldForSearching = new TextField();
+        mistakeLabel = new Label();
         Encrypter encrypter = new Encrypter();
         createEntryStageAndWidgets(encrypter);
     }
@@ -95,7 +99,9 @@ public class PasswordRepository extends Application {
                         if(getPublicKeyReEncryptFileAndPrintFile(encrypter, wrongPasswordLabel, passwordField.getText())){
                             entryStage.close();
                         }
-                    } catch (Exception ignored){}
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -104,20 +110,23 @@ public class PasswordRepository extends Application {
         entryStage.show();
     }
 
-    private static Boolean getPublicKeyReEncryptFileAndPrintFile(Encrypter encrypter, Label wrongPasswordLabel, String password) throws UnrecoverableEntryException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    private static Boolean getPublicKeyReEncryptFileAndPrintFile(Encrypter encrypter, Label wrongPasswordLabel, String password) throws UnrecoverableEntryException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException {
         PublicKey publicKey = null;
         String decryptedText = "";
         try {
             publicKey = encrypter.getPublicKey(password);
         }
-        catch (Exception ignored){}
+        catch (Exception e){
+            e.printStackTrace();
+        }
         if (publicKey != null){
             byte[] decryptedBytes = encrypter.decryptFile(password);
 
             if (decryptedBytes != null){
-                decryptedText = new String(decryptedBytes);
+                decryptedText = new String(decryptedBytes, StandardCharsets.UTF_8);
             }
             copyOfDecryptedText = decryptedText;
+            System.out.println(decryptedText);
             createStageWithDecryptedInformationFromFile(decryptedText, encrypter, password);
             return true;
         }
@@ -133,22 +142,23 @@ public class PasswordRepository extends Application {
 
         Pane informationPane = new Pane();
 
-
         textArea.insertText(0, decryptedText);
         textArea.setPrefSize(x - 150, y - 20);
-        final KeyCombination keyCombinationShiftF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-        final KeyCombination keyCombinationShiftS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
+        final KeyCombination keyCombinationCTRLF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+        final KeyCombination keyCombinationCTRLS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
         textArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (keyCombinationShiftF.match(keyEvent)){
+                if (keyCombinationCTRLF.match(keyEvent)){
                     textFieldForSearching.requestFocus();
                 }
-                else if (keyCombinationShiftS.match(keyEvent)){
+                else if (keyCombinationCTRLS.match(keyEvent)){
                     try {
                         encrypter.encryptInformationAndWriteItToFile(password, textArea.getText());
                     }
-                    catch(Exception ignored){}
+                    catch(Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -184,7 +194,7 @@ public class PasswordRepository extends Application {
                         search(textFieldForSearching.getText(), textArea.getText());
                     } catch (Exception ignored) {}
                 }
-                else if (keyCombinationShiftS.match(keyEvent)) {
+                else if (keyCombinationCTRLS.match(keyEvent)) {
                     try {
                         encrypter.encryptInformationAndWriteItToFile(password, textArea.getText());
                     } catch (Exception ignored) {
@@ -204,7 +214,7 @@ public class PasswordRepository extends Application {
         informationScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (keyCombinationShiftF.match(keyEvent)){
+                if (keyCombinationCTRLF.match(keyEvent)){
                     textFieldForSearching.requestFocus();
                 }
             }
@@ -214,7 +224,7 @@ public class PasswordRepository extends Application {
             @Override
             public void handle(WindowEvent windowEvent) {
                 try {
-                    if (!textArea.getText().equals(new String(encrypter.decryptFile(password)))){
+                    if (!textArea.getText().equals(new String(encrypter.decryptFile(password), StandardCharsets.UTF_8))){
                         try {
                             createAlert(encrypter, password);
                         } catch (Exception ignored){}
@@ -227,9 +237,7 @@ public class PasswordRepository extends Application {
     private static void search(String text, String decryptedText){
         textArea.requestFocus();
         if (needfulText.equals(text)) {
-            System.out.println(1);
             copyOfDecryptedText = copyOfDecryptedText.substring(0, copyOfDecryptedText.indexOf(text)) + copyOfDecryptedText.substring(copyOfDecryptedText.indexOf(text) + text.length());
-            System.out.println(copyOfDecryptedText);
             textCount++;
         } else {
             textCount = 0;
@@ -249,7 +257,7 @@ public class PasswordRepository extends Application {
         }
         needfulText = text;
     }
-    private static void createAlert(Encrypter encrypter, String password) throws NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, BadPaddingException, InvalidKeyException {
+    private static void createAlert(Encrypter encrypter, String password) throws NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, BadPaddingException, InvalidKeyException, NoSuchProviderException, InvalidAlgorithmParameterException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "File has been modified, save changes?", ButtonType.YES, ButtonType.NO);
         alert.setTitle("Save file");
         alert.setHeaderText(null);
