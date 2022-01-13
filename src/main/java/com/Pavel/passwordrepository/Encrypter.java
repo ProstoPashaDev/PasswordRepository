@@ -22,22 +22,6 @@ public class Encrypter {
     //final private String pathToEncryptedKey = "key.dat";
 
     void encryptInformationAndWriteItToFile(String password, String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, IOException, KeyStoreException, UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        //PublicKey publicKey = getPublicKey(password);
-        //Cipher encryptionCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-       // Cipher encryptionCipher = new NullCipher();
-        //Cipher.getInstance("EC", BouncyCastleProvider.PROVIDER_NAME);
-        /*
-        Cipher encryptionCipher = Cipher.getInstance("ECIES", BouncyCastleProvider.PROVIDER_NAME);
-        encryptionCipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        BufferedOutputStream bufferedWriter = new BufferedOutputStream(new FileOutputStream(pathToFile));
-        byte[] encryptedText = encryptionCipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
-        bufferedWriter.write(encryptedText);
-        bufferedWriter.flush();
-        bufferedWriter.close();
-        */
-
-
-
         SecretKey aesKey = getAESKey(password);
         Cipher aesGCMCipher = Cipher.getInstance("AES/GCM/Nopadding");
         GCMParameterSpec staticParameterSpec = new GCMParameterSpec(128, new byte[12]);
@@ -52,22 +36,6 @@ public class Encrypter {
     }
 
     byte[] decryptFile(String password) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException, UnrecoverableEntryException, CertificateException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        //Security.addProvider(new BouncyCastleProvider());
-        //Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        //KeyFactory keyFactory = ECKeyFactory.;
-        //Cipher cipher = Cipher.getInstance("ECIES", BouncyCastleProvider.PROVIDER_NAME);
-        /*cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(password));
-        byte[] symbolsFromFile;
-        Path path = Paths.get(pathToFile);
-        symbolsFromFile = Files.readAllBytes(path);
-        byte[] decryptedText = null;
-        if (!Arrays.equals(symbolsFromFile, new byte[0])){
-            decryptedText = cipher.doFinal(symbolsFromFile);
-        }
-        return decryptedText;*/
-
-
-
         SecretKey aesKey = getAESKey(password);
 
         Cipher decryptionCipher = Cipher.getInstance("AES/GCM/Nopadding");
