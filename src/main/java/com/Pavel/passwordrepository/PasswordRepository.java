@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -25,6 +26,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.text.ParseException;
+import java.util.Locale;
 import java.util.Optional;
 
 public class PasswordRepository extends Application {
@@ -110,7 +113,7 @@ public class PasswordRepository extends Application {
         entryStage.show();
     }
 
-    private static Boolean getPublicKeyReEncryptFileAndPrintFile(Encrypter encrypter, Label wrongPasswordLabel, String password) throws UnrecoverableEntryException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    private static Boolean getPublicKeyReEncryptFileAndPrintFile(Encrypter encrypter, Label wrongPasswordLabel, String password) throws UnrecoverableEntryException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException, ParseException {
         PublicKey publicKey = null;
         String decryptedText = "";
         try {
@@ -126,7 +129,6 @@ public class PasswordRepository extends Application {
                 decryptedText = new String(decryptedBytes, StandardCharsets.UTF_8);
             }
             copyOfDecryptedText = decryptedText;
-            System.out.println(decryptedText);
             createStageWithDecryptedInformationFromFile(decryptedText, encrypter, password);
             return true;
         }
@@ -140,10 +142,16 @@ public class PasswordRepository extends Application {
         Stage informationStage = new Stage();
         informationStage.setTitle("Ok, you arent a virus");
 
-        Pane informationPane = new Pane();
+        AnchorPane informationPane = new AnchorPane();
 
         textArea.insertText(0, decryptedText);
-        textArea.setPrefSize(x - 150, y - 20);
+        textArea.setPrefSize(x - 360, y - 120);
+        AnchorPane.setLeftAnchor(textArea, 20.0);
+        AnchorPane.setRightAnchor(textArea, 150.0);
+        AnchorPane.setBottomAnchor(textArea, 20.0);
+        AnchorPane.setTopAnchor(textArea, 10.0);
+        //textArea.setStyle("-fx-highlight-fill: DeepSkyBlue; -fx-highlight-text-fill: white; -fx-font-size:14px;");
+        textArea.setStyle("-fx-highlight-fill: Moccasin; -fx-highlight-text-fill: black; -fx-font-size:14px;");
         final KeyCombination keyCombinationCTRLF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
         final KeyCombination keyCombinationCTRLS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
         textArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -164,12 +172,14 @@ public class PasswordRepository extends Application {
         });
         mistakeLabel.setLayoutX(x - 133);
         mistakeLabel.setLayoutY(190);
+        AnchorPane.setRightAnchor(mistakeLabel, 20.0);
 
         Button saveFileButton = new Button();
         saveFileButton.setText("Save");
         saveFileButton.setLayoutX(x - 133);
         saveFileButton.setLayoutY(30);
         saveFileButton.setPrefSize(100, 50);
+        AnchorPane.setRightAnchor(saveFileButton, 20.0);
         saveFileButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -182,16 +192,18 @@ public class PasswordRepository extends Application {
         Label textSearchLabel = new Label("Search text");
         textSearchLabel.setLayoutX(x - 117);
         textSearchLabel.setLayoutY(100);
+        AnchorPane.setRightAnchor(textSearchLabel, 60.0);
 
         textFieldForSearching.setLayoutX(x - 133);
         textFieldForSearching.setLayoutY(130);
         textFieldForSearching.setPrefSize(100, 50);
+        AnchorPane.setRightAnchor(textFieldForSearching, 20.0);
         textFieldForSearching.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
                 if(keyEvent.getCode().equals(KeyCode.ENTER)) {
                     try {
-                        search(textFieldForSearching.getText(), textArea.getText());
+                        search(textFieldForSearching.getText().toLowerCase(Locale.ROOT), textArea.getText().toLowerCase(Locale.ROOT));
                     } catch (Exception ignored) {}
                 }
                 else if (keyCombinationCTRLS.match(keyEvent)) {
@@ -202,15 +214,14 @@ public class PasswordRepository extends Application {
                 }
             }
         });
-
-        informationPane.getChildren().add(saveFileButton);
-        informationPane.getChildren().add(textSearchLabel
-        );
         informationPane.getChildren().add(textArea);
+        informationPane.getChildren().add(saveFileButton);
+        informationPane.getChildren().add(textSearchLabel);
         informationPane.getChildren().add(textFieldForSearching);
         informationPane.getChildren().add(mistakeLabel);
 
-        Scene informationScene = new Scene(informationPane, x, y);
+
+        Scene informationScene = new Scene(informationPane, x - 200, y - 100);
         informationScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -235,7 +246,7 @@ public class PasswordRepository extends Application {
         informationStage.show();
     }
     private static void search(String text, String decryptedText){
-        textArea.requestFocus();
+        textArea.selectRange(0, 0);
         if (needfulText.equals(text)) {
             copyOfDecryptedText = copyOfDecryptedText.substring(0, copyOfDecryptedText.indexOf(text)) + copyOfDecryptedText.substring(copyOfDecryptedText.indexOf(text) + text.length());
             textCount++;
@@ -244,7 +255,7 @@ public class PasswordRepository extends Application {
             copyOfDecryptedText = decryptedText;
         }
         if (copyOfDecryptedText.contains(text)) {
-            textArea.positionCaret(copyOfDecryptedText.indexOf(text) + textCount * text.length());
+            textArea.selectRange(copyOfDecryptedText.indexOf(text) + textCount * text.length(), copyOfDecryptedText.indexOf(text) + textCount * text.length() + text.length());
             mistakeLabel.setText(null);
         }
         else {
@@ -255,9 +266,10 @@ public class PasswordRepository extends Application {
                 mistakeLabel.setText("There is no more \n  such text");
             }
         }
+        textFieldForSearching.requestFocus();
         needfulText = text;
     }
-    private static void createAlert(Encrypter encrypter, String password) throws NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, BadPaddingException, InvalidKeyException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    private static void createAlert(Encrypter encrypter, String password) throws NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, BadPaddingException, InvalidKeyException, NoSuchProviderException, InvalidAlgorithmParameterException, ParseException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "File has been modified, save changes?", ButtonType.YES, ButtonType.NO);
         alert.setTitle("Save file");
         alert.setHeaderText(null);

@@ -9,9 +9,6 @@
         <module name="PasswordRepository" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="PasswordRepository" target="11" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
