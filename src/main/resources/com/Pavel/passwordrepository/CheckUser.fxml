@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+<Stage fx:id="entryStage" title="You are a virus, aren`t you?" xmlns:fx="http://javafx.com/fxml" fx:controller="com.Pavel.passwordrepository.CheckUserController">
+    <scene>
+        <Scene width="500" height="300">
+            <Pane fx:id = "entryPane" onKeyPressed="#decryptFileEnt">
+                <Label fx:id="entryPasswordLbl" text = "Enter password" layoutX="5" style="-fx-font-size: 14px;"/>
+                <Label fx:id="wrongPasswordLbl" layoutX="5" layoutY="65"
+                       style="-fx-font-size: 14px; -fx-text-fill: red" visible="false" text="Wrong Password"/>
+                <PasswordField fx:id="passwordField" layoutY="25" style="-fx-font-size: 14px;"/>
+                <Button fx:id="checkPasswordBtn" text="Check password" layoutY="25" layoutX="220"
+                        onMouseClicked="#specifyEncrypter" style="-fx-font-size: 14px;"/>
+            </Pane>
+        </Scene>
+    </scene>
+</Stage>

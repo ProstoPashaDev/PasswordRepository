@@ -1,7 +1,6 @@
 package com.Pavel.passwordrepository;
 
 import javafx.scene.control.Alert;
-import javafx.util.converter.LocalDateStringConverter;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
@@ -15,10 +14,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Encrypter {
@@ -26,42 +22,55 @@ public class Encrypter {
     private String pathToKeyStore = "";
     private String alias = "";
     private boolean fl = true;
-    //final private String pathToFile = "E://Khramov Pavel/Programming in java/PasswordRepository/src/PasswordRepository.dat";
-    final private String pathToFile = "PasswordRepository.dat";
-    //final private String pathToEncryptedKey = "E://Khramov Pavel/Programming in java/PasswordRepository/src/key.dat";
-    final private String pathToEncryptedKey = "key.dat";
+    //private final String PATH_DATAFILE = "E://Khramov Pavel/Programming in java/PasswordRepository/src/PasswordRepository.dat";
+    private final String PATH_DATAFILE = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/PasswordRepository.dat";
+    //private final String PATH_DATAFILE = "PasswordRepository.dat";
+    //private final String PATH_ENCRYPTED_KEY = "E://Khramov Pavel/Programming in java/PasswordRepository/src/key.dat";
+    private final String PATH_ENCRYPTED_KEY = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/key.dat";
+    //private final String PATH_ENCRYPTED_KEY = "key.dat";
+    private final String PATH_CONFIGURATION = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/PasswordRepository.cfg";
+    //private final String PATH_CONFIGURATION = "PasswordRepository.cfg";
+    private static String password;
 
-    void encryptInformationAndWriteItToFile(String password, String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, IOException, KeyStoreException, UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException, ParseException {
-        SecretKey aesKey = getAESKey(password);
+    public byte[] encryptText(String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, IOException, KeyStoreException, UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException, ParseException {
+        SecretKey aesKey = getAESKey(Encrypter.password);
         Cipher aesGCMCipher = Cipher.getInstance("AES/GCM/Nopadding");
         GCMParameterSpec staticParameterSpec = new GCMParameterSpec(128, new byte[12]);
         aesGCMCipher.init(Cipher.ENCRYPT_MODE, aesKey, staticParameterSpec);
         byte[] encryptedText = aesGCMCipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
-        BufferedOutputStream bufferedWriter = new BufferedOutputStream(new FileOutputStream(pathToFile));
+        return encryptedText;
+    }
 
+    public void saveText(String text) throws IOException, InvalidAlgorithmParameterException, NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, NoSuchAlgorithmException, KeyStoreException, BadPaddingException, ParseException, InvalidKeyException, NoSuchProviderException {
+        byte[] encryptedText = encryptText(text);
+        BufferedOutputStream bufferedWriter = new BufferedOutputStream(new FileOutputStream(PATH_DATAFILE));
         bufferedWriter.write(encryptedText);
         bufferedWriter.flush();
         bufferedWriter.close();
-
     }
 
-    byte[] decryptFile(String password) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException, UnrecoverableEntryException, CertificateException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException, ParseException {
-        SecretKey aesKey = getAESKey(password);
+    public String getDecryptedText() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException, UnrecoverableEntryException, CertificateException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException, ParseException {
+        SecretKey aesKey = getAESKey(Encrypter.password);
 
         Cipher decryptionCipher = Cipher.getInstance("AES/GCM/Nopadding");
         GCMParameterSpec staticParameterSpec = new GCMParameterSpec(128, new byte[12]);
         decryptionCipher.init(Cipher.DECRYPT_MODE, aesKey, staticParameterSpec);
 
-        Path path = Paths.get(pathToFile);
+        Path path = Paths.get(PATH_DATAFILE);
         byte[] symbolsFromFile = Files.readAllBytes(path);
-        byte[] decryptedText = new byte[0];
+        byte[] decryptedBytes = new byte[0];
         if (!Arrays.equals(symbolsFromFile, new byte[0])){
-            decryptedText = decryptionCipher.doFinal(symbolsFromFile);
+            decryptedBytes = decryptionCipher.doFinal(symbolsFromFile);
         }
 
-        return decryptedText;
+        return new String(decryptedBytes, StandardCharsets.UTF_8);
     }
-    
+
+    public static void setPassword(String password) {
+        Encrypter.password = password;
+    }
+
+
     PublicKey getPublicKey(String password) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException {
         KeyStore keyStore = optionKeyStoreParam(password);
         PublicKey publicKey = keyStore.getCertificate(alias).getPublicKey();
@@ -117,12 +126,12 @@ public class Encrypter {
     }
     private void getPathToKeystoreAndAlias() throws IOException {
         Properties properties = new Properties();
-        properties.load(new FileInputStream("PasswordRepository.cfg"));
+        properties.load(new FileInputStream(PATH_CONFIGURATION));
         pathToKeyStore = properties.getProperty("Path_to_keystore");
         alias = properties.getProperty("Alias");
     }
     private SecretKey getAESKey(String password) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, InvalidAlgorithmParameterException, BadPaddingException, IOException, UnrecoverableEntryException, CertificateException, KeyStoreException, ParseException {
-        Path path = Paths.get(pathToEncryptedKey);
+        Path path = Paths.get(PATH_ENCRYPTED_KEY);
         byte[] encryptedAESKey = Files.readAllBytes(path);
         if (Arrays.equals(encryptedAESKey, new byte[0])){
             generateAESKey(password);
@@ -138,7 +147,7 @@ public class Encrypter {
         aesKeyGenerator.init(128);
         SecretKey aesKey = aesKeyGenerator.generateKey();
         byte[] wrappedKey = encryptionCipher.wrap(aesKey);
-        BufferedOutputStream bufferedWriter = new BufferedOutputStream(new FileOutputStream(pathToEncryptedKey));
+        BufferedOutputStream bufferedWriter = new BufferedOutputStream(new FileOutputStream(PATH_ENCRYPTED_KEY));
 
         bufferedWriter.write(wrappedKey);
         bufferedWriter.flush();
