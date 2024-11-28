@@ -5,16 +5,48 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.Scene?>
 <?import javafx.stage.Stage?>
-<Stage fx:id="entryStage" title="You are a virus, aren`t you?" xmlns:fx="http://javafx.com/fxml" fx:controller="com.Pavel.passwordrepository.CheckUserController">
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<Stage fx:id="entryStage" title="You are a virus, aren`t you?" xmlns:fx="http://javafx.com/fxml"
+       fx:controller="com.Pavel.passwordrepository.CheckUserController">
+    <icons>
+        <Image url="@Images/key1.png"/>
+    </icons>
+
     <scene>
-        <Scene width="500" height="300">
-            <Pane fx:id = "entryPane" onKeyPressed="#decryptFileEnt">
-                <Label fx:id="entryPasswordLbl" text = "Enter password" layoutX="5" style="-fx-font-size: 14px;"/>
+        <Scene width="500" height="300" onKeyPressed="#decryptFileEnt">
+            <Pane fx:id = "entryPane">
+                <Label fx:id="entryPasswordLbl" text = "Enter password" layoutX="5"
+                       style="-fx-font-size: 14px;"/>
+
                 <Label fx:id="wrongPasswordLbl" layoutX="5" layoutY="65"
                        style="-fx-font-size: 14px; -fx-text-fill: red" visible="false" text="Wrong Password"/>
+
                 <PasswordField fx:id="passwordField" layoutY="25" style="-fx-font-size: 14px;"/>
-                <Button fx:id="checkPasswordBtn" text="Check password" layoutY="25" layoutX="220"
-                        onMouseClicked="#specifyEncrypter" style="-fx-font-size: 14px;"/>
+
+                <TextField fx:id="passwordFieldToSeePwd" layoutY="25" style="-fx-font-size: 14px;" visible="false"/>
+
+                <Button fx:id="seePwdButton" layoutY="25" layoutX="180"
+                        onMouseClicked="#seePassword">
+                    <graphic>
+                        <ImageView>
+                            <Image url="@Images/openEye.jpg" requestedWidth="23" requestedHeight="21"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="hidePwdButton" layoutY="25" layoutX="180"
+                        onMouseClicked="#hidePassword" visible="false">
+                    <graphic>
+                        <ImageView>
+                            <Image url="@Images/closedEye.png" requestedWidth="23" requestedHeight="21"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="checkPasswordBtn" text="Check password" layoutY="25" layoutX="230"
+                        onMouseClicked="#authorize" style="-fx-font-size: 14px;"/>
             </Pane>
         </Scene>
     </scene>

@@ -3,16 +3,15 @@ package com.Pavel.passwordrepository;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.property.DoubleProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -23,16 +22,19 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class PasswordRepositoryController {
 
     static private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     static private final double X = screenSize.getWidth();
+    //private DoubleProperty prefHeight;
     static private final double Y = screenSize.getHeight();
 
     private final KeyCombination KEY_COMBINATION_CTRLF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
@@ -122,7 +124,12 @@ public class PasswordRepositoryController {
         }
     }
 
-    public void search(String searchWord, String text) {
+    /**
+     * Search algorithm O(text*searchWord)
+     * @param searchWord word that we need to find
+     * @param text source text
+     */
+    private void search(String searchWord, String text) {
         textArea.selectRange(0, 0);
 
         if (needfulText.equals(searchWord)) {
@@ -141,14 +148,14 @@ public class PasswordRepositoryController {
                 mistakeSearchLabel.setText("There is no \n such text");
             }
             else {
-                mistakeSearchLabel.setText("There is no \n more such text");
+                mistakeSearchLabel.setText("There is no \nmore such text");
             }
         }
         //textFieldForSearching.requestFocus();
         needfulText = searchWord;
     }
 
-    public void createAlert() throws InvalidAlgorithmParameterException, NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, BadPaddingException, ParseException, InvalidKeyException, NoSuchProviderException {
+    private void createAlert() throws InvalidAlgorithmParameterException, NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, BadPaddingException, ParseException, InvalidKeyException, NoSuchProviderException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "File has been modified, save changes?", ButtonType.YES, ButtonType.NO);
         alert.setTitle("Save file");
         alert.setHeaderText(null);
@@ -156,5 +163,31 @@ public class PasswordRepositoryController {
         if (result.get().equals(ButtonType.YES)){
             onSaveClicked();
         }
+    }
+    
+    /**
+     * Selecting text algorithm, skipping "_", "@" etc.
+     */
+    @FXML
+    private void copyText(MouseEvent mouseEvent) {
+        int caretPos = textArea.getCaretPosition();
+        int leftBorder = Math.max(caretPos - 2, 0);
+        int rightBorder = Math.max(caretPos - 1, 0);
+        if (mouseEvent.getClickCount() == 2) {
+            String text = textArea.getText();
+            while (checkIndex(leftBorder, text) || checkIndex(rightBorder, text)) {
+                if (checkIndex(leftBorder, text)) {
+                    leftBorder--;
+                }
+                if (checkIndex(rightBorder, text)) {
+                    rightBorder++;
+                }
+            }
+            textArea.selectRange(Math.max(leftBorder + 1, 0), rightBorder);
+        }
+    }
+
+    private boolean checkIndex(int index, String text) {
+        return index != 0 && index != text.length() && text.charAt(index) != ' ' && text.charAt(index) != '\n';
     }
 }
