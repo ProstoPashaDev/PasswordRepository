@@ -11,7 +11,7 @@
 <Stage fx:id="entryStage" title="You are a virus, aren`t you?" xmlns:fx="http://javafx.com/fxml"
        fx:controller="com.Pavel.passwordrepository.CheckUserController">
     <icons>
-        <Image url="@Images/key1.png"/>
+        <Image url="@Images/icon.png"/>
     </icons>
 
     <scene>
@@ -31,7 +31,7 @@
                         onMouseClicked="#seePassword">
                     <graphic>
                         <ImageView>
-                            <Image url="@Images/openEye.jpg" requestedWidth="23" requestedHeight="21"/>
+                            <Image url="@Images/openEye.png" requestedWidth="23" requestedHeight="21"/>
                         </ImageView>
                     </graphic>
                 </Button>
