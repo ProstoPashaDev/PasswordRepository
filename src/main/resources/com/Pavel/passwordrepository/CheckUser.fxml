@@ -11,12 +11,12 @@
 <Stage fx:id="entryStage" title="You are a virus, aren`t you?" xmlns:fx="http://javafx.com/fxml"
        fx:controller="com.Pavel.passwordrepository.CheckUserController">
     <icons>
-        <Image url="@Images/icon.png"/>
+        <Image url="@resources/Images/icon.png"/>
     </icons>
 
     <scene>
         <Scene width="500" height="300" onKeyPressed="#decryptFileEnt">
-            <Pane fx:id = "entryPane">
+            <Pane>
                 <Label fx:id="entryPasswordLbl" text = "Enter password" layoutX="5"
                        style="-fx-font-size: 14px;"/>
 
@@ -31,7 +31,7 @@
                         onMouseClicked="#seePassword">
                     <graphic>
                         <ImageView>
-                            <Image url="@Images/openEye.png" requestedWidth="23" requestedHeight="21"/>
+                            <Image url="@resources/Images/openEye.png" requestedWidth="23" requestedHeight="21"/>
                         </ImageView>
                     </graphic>
                 </Button>
@@ -40,7 +40,7 @@
                         onMouseClicked="#hidePassword" visible="false">
                     <graphic>
                         <ImageView>
-                            <Image url="@Images/closedEye.png" requestedWidth="23" requestedHeight="21"/>
+                            <Image url="@resources/Images/closedEye.png" requestedWidth="23" requestedHeight="21"/>
                         </ImageView>
                     </graphic>
                 </Button>

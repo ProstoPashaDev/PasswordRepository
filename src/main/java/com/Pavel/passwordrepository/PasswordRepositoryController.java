@@ -3,7 +3,6 @@ package com.Pavel.passwordrepository;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.property.DoubleProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -20,14 +19,14 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 public class PasswordRepositoryController {
 
@@ -38,6 +37,9 @@ public class PasswordRepositoryController {
 
     private final KeyCombination KEY_COMBINATION_CTRLF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
     private final KeyCombination KEY_COMBINATION_CTRLS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
+
+    //private final String PATH_TO_HTML = "./html/PasswordRepository.html";
+    private final String PATH_TO_HTML = "C:\\Khramov Pavel\\Project\\Java\\PasswordRepository\\src\\main\\resources\\com\\Pavel\\passwordrepository\\resources\\html\\PasswordRepository.html";
 
     @FXML
     TextArea textArea;
@@ -188,5 +190,16 @@ public class PasswordRepositoryController {
 
     private boolean checkIndex(int index, String text) {
         return index != 0 && index != text.length() && text.charAt(index) != ' ' && text.charAt(index) != '\n';
+    }
+
+    @FXML
+    private void showPwdRepositoryInfo() throws IOException {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            File htmlFile = new File(PATH_TO_HTML);
+            if (!htmlFile.exists()) {
+                throw new FileNotFoundException();
+            }
+            Desktop.getDesktop().browse(htmlFile.toURI());
+        }
     }
 }

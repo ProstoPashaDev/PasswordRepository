@@ -32,7 +32,7 @@ public class Encrypter {
     //private final String PATH_CONFIGURATION = "PasswordRepository.cfg";
     private static String password;
 
-    public byte[] encryptText(String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, IOException, KeyStoreException, UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException, ParseException {
+    public byte[] encryptText(String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, IOException, KeyStoreException, UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, ParseException {
         SecretKey aesKey = getAESKey(Encrypter.password);
         Cipher aesGCMCipher = Cipher.getInstance("AES/GCM/Nopadding");
         GCMParameterSpec staticParameterSpec = new GCMParameterSpec(128, new byte[12]);
@@ -41,7 +41,7 @@ public class Encrypter {
         return encryptedText;
     }
 
-    public void saveText(String text) throws IOException, InvalidAlgorithmParameterException, NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, NoSuchAlgorithmException, KeyStoreException, BadPaddingException, ParseException, InvalidKeyException, NoSuchProviderException {
+    public void saveText(String text) throws IOException, InvalidAlgorithmParameterException, NoSuchPaddingException, UnrecoverableEntryException, IllegalBlockSizeException, CertificateException, NoSuchAlgorithmException, KeyStoreException, BadPaddingException, ParseException, InvalidKeyException {
         byte[] encryptedText = encryptText(text);
         BufferedOutputStream bufferedWriter = new BufferedOutputStream(new FileOutputStream(PATH_DATAFILE));
         bufferedWriter.write(encryptedText);
@@ -49,7 +49,7 @@ public class Encrypter {
         bufferedWriter.close();
     }
 
-    public String getDecryptedText() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException, UnrecoverableEntryException, CertificateException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException, ParseException {
+    public String getDecryptedText() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException, UnrecoverableEntryException, CertificateException, KeyStoreException, InvalidAlgorithmParameterException, ParseException {
         SecretKey aesKey = getAESKey(Encrypter.password);
 
         Cipher decryptionCipher = Cipher.getInstance("AES/GCM/Nopadding");
@@ -71,7 +71,7 @@ public class Encrypter {
     }
 
 
-    PublicKey getPublicKey(String password) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException {
+    PublicKey getPublicKey(String password) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
         KeyStore keyStore = optionKeyStoreParam(password);
         PublicKey publicKey = keyStore.getCertificate(alias).getPublicKey();
         return publicKey;
@@ -130,7 +130,7 @@ public class Encrypter {
         pathToKeyStore = properties.getProperty("Path_to_keystore");
         alias = properties.getProperty("Alias");
     }
-    private SecretKey getAESKey(String password) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, InvalidAlgorithmParameterException, BadPaddingException, IOException, UnrecoverableEntryException, CertificateException, KeyStoreException, ParseException {
+    private SecretKey getAESKey(String password) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, IOException, UnrecoverableEntryException, CertificateException, KeyStoreException, ParseException {
         Path path = Paths.get(PATH_ENCRYPTED_KEY);
         byte[] encryptedAESKey = Files.readAllBytes(path);
         if (Arrays.equals(encryptedAESKey, new byte[0])){
@@ -139,7 +139,7 @@ public class Encrypter {
         }
         return decryptAESKey(password, encryptedAESKey);
     }
-    private void generateAESKey(String password) throws NoSuchPaddingException, NoSuchAlgorithmException, UnrecoverableEntryException, CertificateException, IOException, KeyStoreException, InvalidKeyException, IllegalBlockSizeException {
+    private void generateAESKey(String password) throws NoSuchPaddingException, NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException, InvalidKeyException, IllegalBlockSizeException {
         Cipher encryptionCipher = Cipher.getInstance("RSA/ECB/OAEPwithSHA1andMGF1Padding");
         encryptionCipher.init(Cipher.WRAP_MODE, getPublicKey(password));
 
@@ -153,7 +153,7 @@ public class Encrypter {
         bufferedWriter.flush();
         bufferedWriter.close();
     }
-    private SecretKey decryptAESKey(String password, byte[] encryptedAESKey) throws NoSuchPaddingException, NoSuchAlgorithmException, UnrecoverableEntryException, CertificateException, IOException, KeyStoreException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, ParseException {
+    private SecretKey decryptAESKey(String password, byte[] encryptedAESKey) throws NoSuchPaddingException, NoSuchAlgorithmException, UnrecoverableEntryException, CertificateException, IOException, KeyStoreException, InvalidKeyException, ParseException {
         Cipher decryptionCipher = Cipher.getInstance("RSA/ECB/OAEPwithSHA1andMGF1Padding");
         decryptionCipher.init(Cipher.UNWRAP_MODE, getPrivateKey(password));
         SecretKey aesKey = (SecretKey) decryptionCipher.unwrap(encryptedAESKey, "AES", Cipher.SECRET_KEY);

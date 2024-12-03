@@ -52,14 +52,12 @@ public class CheckUserController {
                     ? passwordFieldToSeePwd.getText()
                     : passwordField.getText();
             Encrypter.setPassword(password);
-            //TODO naming
             //Checking password validity
             encrypter.getDecryptedText();
             pwdRepository.showPasswordRepository();
             entryStage.close();
         } catch (IOException e) {
             wrongPwdAnimation();
-            e.printStackTrace();
         }
     }
 
@@ -77,7 +75,7 @@ public class CheckUserController {
 
 
     @FXML
-    public void decryptFileEnt(KeyEvent keyEvent) throws InvalidAlgorithmParameterException, UnrecoverableEntryException, NoSuchPaddingException, IllegalBlockSizeException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, BadPaddingException, ParseException, InvalidKeyException, NoSuchProviderException {
+    public void decryptFileEnt(KeyEvent keyEvent) throws InvalidAlgorithmParameterException, UnrecoverableEntryException, NoSuchPaddingException, IllegalBlockSizeException, CertificateException, KeyStoreException, NoSuchAlgorithmException, BadPaddingException, ParseException, InvalidKeyException, NoSuchProviderException {
         if (keyEvent.getCode().equals(KeyCode.ENTER)) {
             authorize();
         }
