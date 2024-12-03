@@ -1,4 +1,3 @@
 com\Pavel\passwordrepository\PasswordRepository.class
 com\Pavel\passwordrepository\Encrypter.class
-com\Pavel\passwordrepository\ExtraMainClass.class
 module-info.class

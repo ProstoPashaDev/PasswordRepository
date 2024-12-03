@@ -23,13 +23,13 @@ public class Encrypter {
     private String alias = "";
     private boolean fl = true;
     //private final String PATH_DATAFILE = "E://Khramov Pavel/Programming in java/PasswordRepository/src/PasswordRepository.dat";
-    private final String PATH_DATAFILE = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/PasswordRepository.dat";
-    //private final String PATH_DATAFILE = "PasswordRepository.dat";
+    //private final String PATH_DATAFILE = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/PasswordRepository.dat";
+    private final String PATH_DATAFILE = "PasswordRepository.dat";
     //private final String PATH_ENCRYPTED_KEY = "E://Khramov Pavel/Programming in java/PasswordRepository/src/key.dat";
-    private final String PATH_ENCRYPTED_KEY = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/key.dat";
-    //private final String PATH_ENCRYPTED_KEY = "key.dat";
-    private final String PATH_CONFIGURATION = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/PasswordRepository.cfg";
-    //private final String PATH_CONFIGURATION = "PasswordRepository.cfg";
+    //private final String PATH_ENCRYPTED_KEY = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/key.dat";
+    private final String PATH_ENCRYPTED_KEY = "key.dat";
+    //private final String PATH_CONFIGURATION = "C://Khramov Pavel/Project/Java/PasswordRepository/src/main/resources/PasswordRepository.cfg";
+    private final String PATH_CONFIGURATION = "PasswordRepository.cfg";
     private static String password;
 
     public byte[] encryptText(String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, IOException, KeyStoreException, UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, ParseException {
