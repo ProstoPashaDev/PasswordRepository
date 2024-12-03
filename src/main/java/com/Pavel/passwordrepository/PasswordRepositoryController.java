@@ -11,6 +11,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -19,9 +20,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
@@ -30,10 +29,9 @@ import java.util.Optional;
 
 public class PasswordRepositoryController {
 
-    static private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    static private final double X = screenSize.getWidth();
-    //private DoubleProperty prefHeight;
-    static private final double Y = screenSize.getHeight();
+    private final Screen screen = Screen.getPrimary();
+    private final double X = screen.getVisualBounds().getWidth();
+    private final double Y = screen.getVisualBounds().getHeight();
 
     private final KeyCombination KEY_COMBINATION_CTRLF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
     private final KeyCombination KEY_COMBINATION_CTRLS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);

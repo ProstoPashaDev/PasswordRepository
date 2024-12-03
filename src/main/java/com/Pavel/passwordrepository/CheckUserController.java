@@ -58,6 +58,7 @@ public class CheckUserController {
             entryStage.close();
         } catch (IOException e) {
             wrongPwdAnimation();
+            e.printStackTrace();
         }
     }
 
